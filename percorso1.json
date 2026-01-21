@@ -1,5 +1,5 @@
 {
-  "1": {
+  1: {
     "titolo": "Tappa 1",
     "marker": [40.4188, 15.2269],
     "popup": "Santuario Santi Cosma e Damiano",
@@ -21,7 +21,7 @@
     ],
 	"unlockCode": "dGFwcGExLjEu"
   },
-  "2": {
+ 2: {
     "titolo": "Tappa 2",
     "marker": [40.416849, 15.230583],
     "popup": "Chiesa Madre",
@@ -37,7 +37,7 @@
     ],
 	"unlockCode":"dGFwcGExLjIu"	
   },
-    "3": {
+    3: {
     "titolo": "Tappa 3",
     "marker": [40.413560, 15.228038],
     "popup": "Chiesa Santa Maria",
@@ -53,7 +53,7 @@
     ],
 	"unlockCode":"dGFwcGExLjMu"	
   },
-      "4": {
+      4: {
     "titolo": "Tappa 4",
     "marker": [40.4215325, 15.235309],
     "popup": "Chiesa Madonna della Stella",
@@ -70,3 +70,4 @@
 	"unlockCode":"dGFwcGExLjMu"	
   }
 }
+
