@@ -1,0 +1,72 @@
+{
+  "1": {
+    "titolo": "Tappa 1",
+    "marker": [40.4188, 15.2269],
+    "popup": "Santuario Santi Cosma e Damiano",
+    "descrizione": "Il Santuario dei Santi Cosma e Damiano, costruito nella prima metà del Settecento, si trova nell’omonimo borgo lungo la strada provinciale ed è una delle mete di pellegrinaggio più importanti di Castel San Lorenzo. La chiesa presenta una sola navata e quattro altari laterali, con l’altare maggiore realizzato in marmo nel 1902 grazie alla devozione dei cittadini castellesi residenti a New York. Originariamente affrescata da Carmine Natale e Gabriele Croce con scene sulla vita dei Martiri, la volta fu ricoperta di stucchi nel 1848 a seguito di un crollo. Sull’altare maggiore si trovano tre nicchie: due dedicate ai Santi Cosma e Damiano e quella centrale al patrono San Giovanni Battista, la cui statua, realizzata dal celebre scultore napoletano Colombo agli inizi del Settecento, fu trasferita qui dalla chiesa parrocchiale. Le statue dei Santi e quelle di San Francesco Borgia e San Luigi risalgono al XVIII secolo. All’interno si conservano numerose opere di Carmine Natale, tra cui due grandi tele: il Gruppo della Vergine e Gesù morto (1779) e i Santi innamorati della SS. Eucarestia, oltre a due pitture lignee sotto la cantoria dell’organo raffiguranti la Fede e la Carità. Elevata a Santuario nel 2009, la chiesa è famosa per le devozioni legate ai Santi Cosma e Damiano, Medici e Martiri, ai quali vengono attribuiti numerosi miracoli. Pellegrini provenienti da diversi paesi raggiungevano il Santuario a piedi, anche scalzi, offrendo voti in segno di ringraziamento: oggetti preziosi, in oro, argento o bronzo, spesso raffiguranti la parte del corpo per la quale si chiedeva l’intercessione. Oggi il Santuario dei Santi Cosma e Damiano continua a essere un simbolo di fede, devozione e tradizione, attrazione culturale e religiosa del territorio, ammirato anche per le sue opere artistiche e la storia che custodisce.",
+    "steps": [{"instruction": "Parti dal centro del paese", "distance": 90}],
+    "quiz": [
+      {
+        "domanda": "Quali Santi sono presenti in questa chiesa?",
+        "risposte": ["San Cosma e Damiano", "San Giovanni, San Francesco, San Luigi, San Cosma, San Damiano", "San Luigi e San Francesco"],
+        "corretta": 1,
+        "punti": 10
+      },
+	  {
+        "domanda": "AAAA",
+        "risposte": ["A", "B", "C"],
+        "corretta": 1,
+        "punti": 10
+      }
+    ],
+	"unlockCode": "dGFwcGExLjEu"
+  },
+  "2": {
+    "titolo": "Tappa 2",
+    "marker": [40.416849, 15.230583],
+    "popup": "Chiesa Madre",
+    "descrizione": "Con l’espansione del paese e il progressivo degrado della vecchia chiesa parrocchiale, nel 1760 si decise di costruire una nuova e più ampia Chiesa Parrocchiale di San Giovanni Battista, su un terreno donato dalla famiglia Carafa, poco distante dall’edificio originario. La sua edificazione trasformò l’assetto urbano, aprendo una nuova via di accesso e interrompendo un antico passaggio sotterraneo che, secondo la tradizione, collegava le proprietà dei Carafa ed era usato come via di fuga. La chiesa attuale, completata intorno al 1800 e già benedetta nel 1796, presenta un’unica navata luminosa a croce latina, impreziosita da colonne con capitelli corinzi e basamenti in granito. Fu realizzata grazie al contributo dell’intera comunità, che partecipò attivamente alla costruzione e, secoli dopo, anche al restauro successivo al terremoto del 1980. All’interno si conservano numerosi altari laterali e importanti opere d’arte, tra cui la grande tela di Andrea Vaccaro, San Pietro in Vinculis, proveniente dalla “Pinacoteca Carafa”, e il monumentale dipinto di Carmine Natale, San Giovanni Battista che predica le turbe (1782), collocato sull’altare maggiore. Di grande interesse anche il Battesimo di Gesù nel Giordano, di autore ignoto. Sotto l’altare maggiore si trova una cripta, mai utilizzata per le sepolture dei sacerdoti.",
+	"steps": [{"instruction": "Parti dal centro del paese", "distance": 90}],
+    "quiz": [
+      {
+        "domanda": "Quale dipinto è collocato sull'altare maggiore?",
+        "risposte": ["San Giovanni Battista che predica le genti", "San Giovanni Battista che predica il popolo", "San Giovanni Battista che predica le turbe"],
+        "corretta": 2,
+        "punti": 10
+      }
+    ],
+	"unlockCode":"dGFwcGExLjIu"	
+  },
+    "3": {
+    "titolo": "Tappa 3",
+    "marker": [40.413560, 15.228038],
+    "popup": "Chiesa Santa Maria",
+    "descrizione": "La Chiesa di Santa Maria del Monte, terminata nel 1713 e un tempo chiamata Santa Maria extra moenia perché situata fuori dall’abitato, custodisce una statua della Madonna simile a quella del Santuario di Novi Velia. La chiesa presenta una navata unica, è in stile Barocco ed una volta presentava un soffitto in legno a cassettoni (perduto a causa dell’umidità). Fu ampliata nel 1753 dal parroco Don Agnello Milone. All’interno si trovano sette altari, tra cui l’altare maggiore con il celebre quadro Il Padre Eterno di Ciriaco Croce, e altre opere del Croce e di Carmine Natale, che raffigurano santi, la Madonna Addolorata e scene della vita cristiana. Tra queste spicca la Madonna delle Grazie, detta “del Latte”, simbolo delle grazie concesse ai fedeli. La chiesa custodisce anche monumenti funebri di importanti famiglie locali, come i Carafa e i Milone, e il vescovo D. Gaetano Ivone di Felitto, ospite del Principe Carafa. Fino al 1840 fu luogo di sepoltura dei defunti del paese. La chiesa rappresenta non solo un importante luogo di culto, ma anche un tesoro di arte e storia locale, testimone della fede e delle tradizioni di Castel San Lorenzo.",
+	"steps": [{"instruction": "Parti dal centro del paese", "distance": 90}],
+    "quiz": [
+      {
+        "domanda": "Quale opera spicca tra le tante presenti?",
+        "risposte": ["Il Padre Eterno", "Opere che raffigurano Santi", "La Madonna delle Grazie, detta del latte"],
+        "corretta": 2,
+        "punti": 10
+      }
+    ],
+	"unlockCode":"dGFwcGExLjMu"	
+  },
+      "4": {
+    "titolo": "Tappa 4",
+    "marker": [40.4215325, 15.235309],
+    "popup": "Chiesa Madonna della Stella",
+    "descrizione": "",
+	"steps": [{"instruction": "Parti dal centro del paese", "distance": 90}],
+    "quiz": [
+      {
+        "domanda": "Quale dipinto è collocato sull'altare maggiore?",
+        "risposte": ["San Giovanni Battista che predica le genti", "San Giovanni Battista che predica il popolo", "San Giovanni Battista che predica le turbe"],
+        "corretta": 2,
+        "punti": 10
+      }
+    ],
+	"unlockCode":"dGFwcGExLjMu"	
+  }
+}

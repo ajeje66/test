@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Percorso Castel San Lorenzo SPA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="leaflet.css" />
+
+<style>
+  #map { height:50vh; }
+  #instructions, #descrizione, #quiz { height:25vh; overflow-y:auto; padding:0 10px; background:#f8f8f8; transition: max-height 0.5s ease, padding 0.5s ease; max-height:0; }
+  #instructions.show, #descrizione.show{ max-height:300px; padding:10px; overflow-y:auto; border-bottom:1px dotted gray; }
+  #quiz.show { max-height:150px; padding:10px; overflow-y:auto; }
+  .step { padding:8px 0; border-bottom:1px solid #ddd; }
+  .step b { display:block; }
+
+  /* pulsanti */
+  .next-btn { width: 45%; max-width: 160px; height: 52px; margin: 5px; background-color: #a51b1b; color:#fff; border:none; border-radius:14px; font-size:17px; font-weight:600; box-shadow:-9px 8px 10px rgba(251, 0, 0, 0.15); }
+  .next-btn:disabled { background:#e5e1d8; color:#9c9c9c; box-shadow:-9px 8px 10px rgba(229,225 , 216, 0.40); cursor:not-allowed; }
+  .btn-secondary { background-color:#a51b1b; border-radius:20px; color:#f2f2f1; border:2px solid #d8cbb3; padding:5px 10px; margin:5px; box-shadow: 0px 0px 14px 6px rgb(0 0 0 / 11%) }
+  .btn-risposta { background-color:#30a51b; border-radius:20px; color:#f2f2f1; border:2px solid #d8cbb3; padding:5px 10px; margin:5px; box-shadow: 0px 0px 20px 10px rgb(0 0 0 / 19%)}
+
+  /* toast */
+  #toast, #qr-toast {white-space:pre-line; visibility:hidden; background:#333; color:#fff; text-align:center; border-radius:8px; padding:10px; position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:1000; opacity:0; transition:opacity 0.5s, visibility 0.5s; }
+  #toast.show, #qr-toast.show { visibility:visible; opacity:1; }
+
+  #qr-reader { width:300px; margin-top:10px; }
+  #closeToast { margin-top:10px; width:100%; padding:5px; }
+  #codeInput { padding:5px; width:180px; }
+  .tappa-circle {
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:#ddd;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  color:#555;
+  cursor:pointer;
+  transition: all 0.3s;
+}
+.tappa-circle.completed {
+  background:#28a61b;
+  color:#fff;
+}
+.tappa-circle.current {
+  border:3px solid #a51b1b;
+}
+
+</style>
+</head>
+
+<body>
+<div style="padding:10px 20px;">
+	<div id="progress-container" style="display:flex; justify-content:space-between; align-items:center; margin:10px 20px;">
+	</div>
+
+</div>
+<div id="map"></div>
+
+<div style="padding:10px; text-align:center; background:#eee;border-bottom: 1px solid black;">
+  <button class="btn-secondary" id="toggleInstructionsBtn">Mostra istruzioni</button>
+  <button class="btn-secondary" id="toggleDescrizioneBtn">Mostra descrizione</button>
+  <button class="btn-secondary" id="toggleDomanda">Nascondi domanda</button>
+  <button class="btn-secondary" id="centra" style="font-size:10px">Centra su ultima tappa</button>
+  <button id="showAllBtn" style="display:none;" class="btn-secondary">Mostra tutte le tappe</button>
+
+</div>
+
+<div id="instructions"></div>
+<div id="descrizione"></div>
+
+<div id="quiz" class="show">	
+	<div id="quiz-counter" style="margin-bottom:5px; font-weight:bold; text-align:center;"></div>
+	<div style="font-size:19px; font-weight:bold;" id="quiz-domanda"></div>
+	<div id="quiz-risposte"></div> 
+	<button id="quiz-btn" class="btn-risposta">
+		Conferma risposta
+	</button>
+	<div id="quiz-navigation" style="text-align:center;">
+		<button id="quiz-prev" class="btn-secondary">⬅ Indietro</button>
+		<button id="quiz-next" class="btn-secondary">Avanti ➡</button>
+	</div> 
+</div>
+
+
+<div style="padding:10px; background:#eee; text-align:center; border-top:1px solid black;">
+  <input autocomplete="off" id="codeInput" placeholder="Inserisci codice">
+  <button class="btn-secondary" id="unlockBtn">Sblocca</button>
+  <button class="btn-secondary" id="openQrBtn">Scansiona QR</button>
+</div>
+
+
+<div style="display:flex; justify-content:center; padding:10px;">
+  <button id="prev_page" class="next-btn">Indietro</button>
+  <button id="next_page" class="next-btn" disabled>Prosegui</button>
+</div>
+
+
+<div id="qr-toast">
+  <b>Scansiona il QR</b>
+  <div id="qr-reader"></div>
+  <button id="closeToast">Chiudi</button>
+</div>
+
+<div id="toast"></div>
+
+<script src="leaflet.js"></script>
+<script src="html5-qrcode.min.js"></script>
+
+<script>
+const PERCORSO_ID = "Percorso1";//!!!!!!!========!!!!!!
+function key(nome){
+  return `${PERCORSO_ID}_${nome}`;
+}
+
+function aggiornaProgressBar() {
+  const container = document.getElementById("progress-container");
+  container.innerHTML = "";
+  const total = Object.keys(TAPPE).length;
+
+  for(let i=1; i<=total; i++){
+    const circle = document.createElement("div");
+    circle.className = "tappa-circle";
+
+    if(i < stato.sbloccata || i === 1) circle.classList.add("completed");
+    if(i === stato.tappa) circle.classList.add("current");
+
+    circle.textContent = i;
+    circle.onclick = () => {
+      if(i <= stato.sbloccata) caricaTappa(i); // permette clic solo su tappe sbloccate
+    }
+
+    container.appendChild(circle);
+  }
+}
+
+/* ===== STATO SPA ===== */
+let TAPPE = {};
+let stato = { tappa: 1, sbloccata: 1 };
+stato.quizIndex = stato.quizIndex || {};
+
+
+const salvato = localStorage.getItem(key("percorso"));
+if (salvato) stato = JSON.parse(salvato);
+stato.quizSuperati = JSON.parse(localStorage.getItem(key("quizSuperati"))) || {};
+stato.punteggio = Number(localStorage.getItem(key("punteggio"))) || 0;
+stato.risposteDate = JSON.parse(localStorage.getItem(key("risposteDate"))) || {};
+let codiciUsati = JSON.parse(localStorage.getItem(key("codiciUsati"))) || [];
+
+function aggiornaShowAllBtn() {
+  const total = Object.keys(TAPPE).length;
+  const allUnlocked = stato.sbloccata >= total; // se sbloccata > numero di tappe
+  const btn = document.getElementById("showAllBtn");
+  btn.style.display = allUnlocked ? "inline-block" : "none";
+}
+
+
+/* ===== MAPPA ===== */
+const map = L.map("map",{minZoom:15,maxZoom:18}).setView([40.4188, 15.2269], 16);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{ attribution:"&copy; OpenStreetMap contributors" }).addTo(map);
+const bounds = L.latLngBounds([40.40649,15.19628],[40.42944,15.25177]);
+map.setMaxBounds(bounds);
+map.options.maxBoundsViscosity = 1.0;
+
+let unicoMarker; // marker unico
+
+/* ===== ELEMENTI DOM ===== */
+const nextBtn = document.getElementById("next_page");
+const prevBtn = document.getElementById("prev_page");
+const instructionsDiv = document.getElementById("instructions");
+const descrizioneDiv = document.getElementById("descrizione");
+const domandaDiv = document.getElementById("quiz");
+
+/* ===== TOAST ===== */
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 3000);
+}
+
+/* ===== SBLOCCO ===== */
+function unlock(code){
+  const t = TAPPE[stato.tappa];
+  if(codiciUsati.includes(code)){
+	showToast("Codice " + code + " già inserito!");
+	return;
+	}
+  if(code === t.unlockCode){
+	codiciUsati.push(code);
+	localStorage.setItem(key("codiciUsati"), JSON.stringify(codiciUsati));
+	stato.sbloccata = Math.max(stato.sbloccata, stato.tappa + 1);
+	localStorage.setItem(key("percorso"), JSON.stringify(stato));
+    nextBtn.disabled = false;
+    showToast("Tappa sbloccata!");
+	document.getElementById("codeInput").value="";
+    closeQrToast();
+  } else {
+    showToast("Codice / QR errato");
+  }
+	nextBtn.disabled = stato.sbloccata < stato.tappa + 1;
+	aggiornaProgressBar();
+	aggiornaShowAllBtn();
+}
+
+/* ===== BUTTON ===== */
+
+document.getElementById("unlockBtn").onclick = ()=>{ unlock(document.getElementById("codeInput").value.trim()); document.getElementById("codeInput").value=""; };
+let html5QrCode;
+function openQrToast(){
+  document.getElementById("qr-toast").classList.add("show");
+  if(!html5QrCode){
+    html5QrCode = new Html5Qrcode("qr-reader");
+    html5QrCode.start(
+      { facingMode:"environment" },
+      { fps:10, qrbox:250 },
+      decodedText => unlock(decodedText)
+    );
+  }
+}
+function closeQrToast(){
+  document.getElementById("qr-toast").classList.remove("show");
+  if(html5QrCode){
+    html5QrCode.stop().then(()=>{
+      html5QrCode.clear();
+      html5QrCode = null;
+    });
+  }
+}
+document.getElementById("openQrBtn").onclick = openQrToast;
+document.getElementById("closeToast").onclick = closeQrToast;
+
+/* ===== TOGGLE ISTRUZIONI/DESCRIZIONE ===== */
+document.getElementById("toggleInstructionsBtn").onclick = function() {
+  instructionsDiv.classList.toggle("show");
+  this.textContent = instructionsDiv.classList.contains("show") ? "Nascondi Istruzioni" : "Mostra istruzioni";
+};
+document.getElementById("toggleDescrizioneBtn").onclick = function() {
+  descrizioneDiv.classList.toggle("show");
+  this.textContent = descrizioneDiv.classList.contains("show") ? "Nascondi Descrizione" : "Mostra Descrizione";
+};
+document.getElementById("centra").onclick = function(){ if(unicoMarker) map.setView(unicoMarker.getLatLng(),16); };
+
+document.getElementById("toggleDomanda").onclick = function() {
+  domandaDiv.classList.toggle("show");
+  this.textContent = domandaDiv.classList.contains("show") ? "Nascondi domanda" : "Mostra domanda";
+};
+
+/* ===== CARICA TAPPA ===== */
+function caricaTappa(n){
+  const t = TAPPE[n];
+  if(!t) return;
+	
+  stato.tappa = n;
+  localStorage.setItem(key("percorso"), JSON.stringify(stato));
+
+  // marker
+  if(!unicoMarker){
+    unicoMarker = L.marker(t.marker).addTo(map);
+    unicoMarker.bindPopup(`<b>${t.titolo}</b><br>${t.popup}`);
+  } else {
+    unicoMarker.setLatLng(t.marker).setPopupContent(`<b>${t.titolo}</b><br>${t.popup}`);
+  }
+  map.setView(t.marker,16);
+
+  // descrizione
+  descrizioneDiv.innerHTML = t.descrizione;
+
+  // istruzioni
+  instructionsDiv.innerHTML = "";
+  t.steps.forEach((step,i)=>{
+    const div = document.createElement("div");
+    div.className="step";
+    div.innerHTML=`<b>${i+1}. ${step.instruction}</b>${step.distance>0?" ("+step.distance+" m)":""}`;
+    instructionsDiv.appendChild(div);
+  });
+
+    // pulsanti
+  const total = Object.keys(TAPPE).length;
+  prevBtn.disabled = n <= 1;
+
+  if(n >= total){
+    nextBtn.textContent = "Fine";
+    nextBtn.disabled = false; // sempre cliccabile all'ultima tappa
+	aggiornaProgressBar();
+  } else {
+    nextBtn.textContent = "Prosegui";
+    nextBtn.disabled = stato.sbloccata < n + 1;
+  }
+
+  // aggiorna onclick dinamicamente
+  nextBtn.onclick = () => {
+    if(stato.tappa >= total){
+      window.location.href = "";
+	  //localStorage.clear();  !!!!!!!!!!!!!============!!!!!!!!!!!!
+    } else {
+      caricaTappa(stato.tappa + 1);
+    }
+  };
+	aggiornaProgressBar();
+	aggiornaShowAllBtn();
+	caricaQuiz(n);
+}
+
+/*=======QUIZ=========*/
+function caricaQuiz(tappaId) {
+  const quizDiv = document.getElementById("quiz");
+  const domandaEl = document.getElementById("quiz-domanda");
+  const risposteEl = document.getElementById("quiz-risposte");
+  const btn = document.getElementById("quiz-btn");
+
+  const tappa = TAPPE[tappaId];
+  if (!tappa || !tappa.quiz || tappa.quiz.length === 0) {
+    quizDiv.style.display = "none";
+    return;
+  }
+
+  quizDiv.style.display = "block";
+
+  if (!stato.quizIndex[tappaId]) stato.quizIndex[tappaId] = 0;
+  const index = stato.quizIndex[tappaId];
+  const q = tappa.quiz[index];
+  const quizCounter = document.getElementById("quiz-counter");
+  quizCounter.textContent = `Domanda ${index + 1} di ${tappa.quiz.length}`;
+
+  // quiz finito
+  if (!q) {
+    domandaEl.textContent = "Quiz completato 🎉";
+    risposteEl.innerHTML = "";
+    btn.style.display = "none";
+    stato.quizSuperati[tappaId] = true;
+    localStorage.setItem(key("quizSuperati"), JSON.stringify(stato.quizSuperati));
+    return;
+  }
+
+  domandaEl.textContent = q.domanda;
+  risposteEl.innerHTML = "";
+  btn.style.display = "inline-block";
+  btn.disabled = false;
+
+  q.risposte.forEach((r, i) => {
+    const label = document.createElement("label");
+    label.style.display = "block";
+    label.innerHTML = `<input type="radio" name="quiz" value="${i}"> ${r}`;
+    risposteEl.appendChild(label);
+  });
+  // SE LA DOMANDA ERA GIA' STATA RISPONSA
+	const risposteSalvate = stato.risposteDate?.[tappaId]?.[index];
+	if(risposteSalvate !== undefined){
+		const radio = risposteEl.querySelector(`input[value="${risposteSalvate}"]`);
+		if(radio) radio.checked = true;
+
+		// evidenzia risposta corretta
+		document.querySelectorAll('label').forEach((label, i) => {
+			if(i === q.corretta){
+				label.style.color = "green";
+				label.style.fontWeight = "bold";
+			}
+		});
+
+		// disabilita radio e bottone conferma
+		document.querySelectorAll('input[name="quiz"]').forEach(r => r.disabled = true);
+		btn.disabled = true;
+	}
+
+  btn.style.display = "inline-block";
+  btn.disabled = false;
+  
+	const quizPrevBtn = document.getElementById("quiz-prev");
+	const quizNextBtn = document.getElementById("quiz-next");
+	
+	quizPrevBtn.onclick = () => {
+	const tappaId = stato.tappa;
+	if(stato.quizIndex[tappaId] > 0){
+		stato.quizIndex[tappaId]--;
+		caricaQuiz(tappaId);
+	}
+	};
+	
+	quizNextBtn.onclick = () => {
+	const tappaId = stato.tappa;
+	const t = TAPPE[tappaId];
+	if(stato.quizIndex[tappaId] < t.quiz.length - 1){
+		stato.quizIndex[tappaId]++;
+		caricaQuiz(tappaId);
+	}
+	
+	};
+
+  btn.onclick = () => {
+    const selected = document.querySelector('input[name="quiz"]:checked');
+    if (!selected) {
+      showToast("Seleziona una risposta");
+      return;
+    }
+
+    const rispostaIndex = Number(selected.value);
+    document.querySelectorAll('input[name="quiz"]').forEach(r => r.disabled = true);
+    btn.disabled = true;
+
+    document.querySelectorAll('label').forEach((label, i) => {
+      if (i === q.corretta) {
+        label.style.color = "green";
+        label.style.fontWeight = "bold";
+      }
+    });
+
+    if (rispostaIndex === q.corretta) {
+      stato.punteggio += q.punti;
+      showToast(`Risposta corretta! +${q.punti} punti`);
+    } else {
+      showToast(`Risposta errata`);
+    }
+	
+	// salva la risposta data
+	if(!stato.quizSuperati[tappaId]) stato.quizSuperati[tappaId] = [];
+	stato.quizSuperati[tappaId].push(index);
+
+	// SALVATAGGIO RISPOSTA SCELTA
+	if(!stato.risposteDate) stato.risposteDate = {};
+	if(!stato.risposteDate[tappaId]) stato.risposteDate[tappaId] = {};
+	stato.risposteDate[tappaId][index] = rispostaIndex;
+
+	localStorage.setItem(key("punteggio"), stato.punteggio);
+	localStorage.setItem(key("quizSuperati"), JSON.stringify(stato.quizSuperati));
+	localStorage.setItem(key("risposteDate"), JSON.stringify(stato.risposteDate));
+  };
+}
+
+
+
+/* ===== NAVIGAZIONE ===== */
+nextBtn.onclick = () => { if(!nextBtn.disabled) caricaTappa(stato.tappa + 1); };
+prevBtn.onclick = () => { if(stato.tappa > 1) caricaTappa(stato.tappa - 1); };
+
+/* ===== CARICA TAPPE DA JSON ===== */
+fetch("percorso1.json")
+  .then(r=>r.json())
+  .then(data=>{
+    TAPPE = data;
+    caricaTappa(stato.tappa);
+  })
+  .catch(err=>{
+    console.error("Errore caricamento tappe:", err);
+    showToast("Errore caricamento tappe");
+  });
+  
+  
+ /*======MOSTRA TAPPE=======*/
+ document.getElementById("showAllBtn").onclick = () => {
+  for(const key in TAPPE){
+    const t = TAPPE[key];
+    // crea un marker per ogni tappa
+    L.marker(t.marker)
+     .addTo(map)
+     .bindPopup(`<b>${t.titolo}</b><br>${t.popup}`);
+  }
+
+  // opzionale: centra la mappa sulle tappe
+  const bounds = L.latLngBounds(Object.values(TAPPE).map(t => t.marker));
+  map.fitBounds(bounds);
+};
+</script>
+
+</body>
+</html>
