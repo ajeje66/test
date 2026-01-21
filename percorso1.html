@@ -252,7 +252,10 @@ document.getElementById("toggleDomanda").onclick = function() {
 /* ===== CARICA TAPPA ===== */
 function caricaTappa(n){
   const t = TAPPE[n];
-  if(!t) return;
+   if(!TAPPE[n]){
+    console.error("Tappa non trovata:", n);
+    return;
+  }
 	
   stato.tappa = n;
   localStorage.setItem(key("percorso"), JSON.stringify(stato));
@@ -438,13 +441,17 @@ prevBtn.onclick = () => { if(stato.tappa > 1) caricaTappa(stato.tappa - 1); };
 
 /* ===== CARICA TAPPE DA JSON ===== */
 fetch("percorso1.json")
-  .then(r=>r.json())
-  .then(data=>{
+  .then(r => {
+    if (!r.ok) throw new Error("JSON non trovato");
+    return r.json();
+  })
+  .then(data => {
     TAPPE = data;
+    console.log("TAPPE caricate:", TAPPE);
     caricaTappa(stato.tappa);
   })
-  .catch(err=>{
-    console.error("Errore caricamento tappe:", err);
+  .catch(err => {
+    console.error(err);
     showToast("Errore caricamento tappe");
   });
   
@@ -467,3 +474,4 @@ fetch("percorso1.json")
 
 </body>
 </html>
+
