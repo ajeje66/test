@@ -96,6 +96,7 @@
 <div style="display:flex; justify-content:center; padding:10px;">
   <button id="prev_page" class="next-btn">Indietro</button>
   <button id="next_page" class="next-btn" disabled>Prosegui</button>
+  <button class="btn-secondary" id="resetProgressBtn">🔄 Ripristina percorso</button>
 </div>
 
 
@@ -470,8 +471,28 @@ fetch("percorso1.json")
   const bounds = L.latLngBounds(Object.values(TAPPE).map(t => t.marker));
   map.fitBounds(bounds);
 };
+document.getElementById("resetProgressBtn").onclick = () => {
+  if (!confirm("Vuoi davvero cancellare tutti i progressi?")) return;
+
+  // Cancella solo i dati di questo percorso
+  localStorage.removeItem(key("percorso"));
+  localStorage.removeItem(key("quizSuperati"));
+  localStorage.removeItem(key("punteggio"));
+  localStorage.removeItem(key("risposteDate"));
+  localStorage.removeItem(key("codiciUsati"));
+
+  // Reset stato runtime
+  stato = { tappa: 1, sbloccata: 1, quizIndex: {} };
+
+  showToast("Progressi ripristinati!");
+  
+  // Ricarica la prima tappa
+  caricaTappa(1);
+};
+
 </script>
 
 </body>
 </html>
+
 
