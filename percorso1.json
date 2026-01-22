@@ -11,12 +11,6 @@
         "risposte": ["San Cosma e Damiano", "San Giovanni, San Francesco, San Luigi, San Cosma, San Damiano", "San Luigi e San Francesco"],
         "corretta": 1,
         "punti": 10
-      },
-	  {
-        "domanda": "AAAA",
-        "risposte": ["A", "B", "C"],
-        "corretta": 1,
-        "punti": 10
       }
     ],
 	"unlockCode": "dGFwcGExLjEu"
@@ -31,6 +25,12 @@
       {
         "domanda": "Quale dipinto è collocato sull'altare maggiore?",
         "risposte": ["San Giovanni Battista che predica le genti", "San Giovanni Battista che predica il popolo", "San Giovanni Battista che predica le turbe"],
+        "corretta": 2,
+        "punti": 10
+      },
+	  {
+        "domanda": "Chi è l'autore dell'opera San Pietro in vinculis?",
+        "risposte": ["Carmine Natale", "Gabriele Croce", "Andrea Vaccaro"],
         "corretta": 2,
         "punti": 10
       }
@@ -70,5 +70,6 @@
 	"unlockCode":"dGFwcGExLjMu"	
   }
 }
+
 
 
