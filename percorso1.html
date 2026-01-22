@@ -48,6 +48,76 @@
 .tappa-circle.current {
   border:3px solid #a51b1b;
 }
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 18px;
+  width: 280px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,.3);
+  transform: scale(0.85);
+  opacity: 0;
+  transition: all .25s ease;
+}
+
+.modal-bg.show .modal-card {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.modal-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #a51b1b;
+  margin-bottom: 10px;
+}
+
+.modal-text {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 15px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-btn {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-btn.secondary {
+  background: #ddd;
+}
+
+.modal-btn.danger {
+  background: #a51b1b;
+  color: white;
+}
+
 
 </style>
 </head>
@@ -90,14 +160,15 @@
   <input autocomplete="off" id="codeInput" placeholder="Inserisci codice">
   <button class="btn-secondary" id="unlockBtn">Sblocca</button>
   <button class="btn-secondary" id="openQrBtn">Scansiona QR</button>
+  <button class="btn-secondary" id="resetProgressBtn">🔄 Ripristina percorso</button>
+
 </div>
 
 
 <div style="display:flex; justify-content:center; padding:10px;">
   <button id="prev_page" class="next-btn">Indietro</button>
   <button id="next_page" class="next-btn" disabled>Prosegui</button>
-  <button class="btn-secondary" id="resetProgressBtn">🔄 Ripristina percorso</button>
-</div>
+ </div>
 
 
 <div id="qr-toast">
@@ -107,6 +178,20 @@
 </div>
 
 <div id="toast"></div>
+<div id="resetModal" class="modal-bg">
+  <div class="modal-card">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">Ripristinare il percorso?</div>
+    <div class="modal-text">
+      Tutti i progressi, quiz e tappe sbloccate verranno cancellati.
+    </div>
+
+    <div class="modal-buttons">
+      <button id="cancelReset" class="modal-btn secondary">Annulla</button>
+      <button id="confirmReset" class="modal-btn danger">Ripristina</button>
+    </div>
+  </div>
+</div>
 
 <script src="leaflet.js"></script>
 <script src="html5-qrcode.min.js"></script>
@@ -489,9 +574,43 @@ document.getElementById("resetProgressBtn").onclick = () => {
   // Ricarica la prima tappa
   caricaTappa(1);
 };
+const resetModal = document.getElementById("resetModal");
+
+// pulsante reset
+document.getElementById("resetProgressBtn").onclick = () => {
+  resetModal.classList.add("show");
+  resetModal.style.display = "flex";
+};
+
+// annulla
+document.getElementById("cancelReset").onclick = () => {
+  resetModal.classList.remove("show");
+  setTimeout(()=> resetModal.style.display = "none", 200);
+};
+
+// conferma
+document.getElementById("confirmReset").onclick = () => {
+  resetModal.classList.remove("show");
+  setTimeout(()=> resetModal.style.display = "none", 200);
+
+  resetProgress();
+};
+
+// funzione reset
+function resetProgress(){
+  localStorage.removeItem(key("percorso"));
+  localStorage.removeItem(key("quizSuperati"));
+  localStorage.removeItem(key("punteggio"));
+  localStorage.removeItem(key("risposteDate"));
+  localStorage.removeItem(key("codiciUsati"));
+
+  stato = { tappa:1, sbloccata:1, quizIndex:{} };
+  showToast("Percorso ripristinato!");
+  caricaTappa(1);
+}
+
 
 </script>
-
 </body>
 </html>
 
